@@ -17,5 +17,5 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting() {
-    Text(text = "Hello, My App!")
+Text(text = "Welcome to Vision Voice - Empowering Your Vision!                                    ")
 }
