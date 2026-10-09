@@ -1,4 +1,4 @@
-  name: Build AAB
+name: Build AAB
 on: [push, workflow_dispatch]
 jobs:
   build:
