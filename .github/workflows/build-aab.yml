@@ -8,36 +8,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Find Gradle Project
+      - name: List all files
         run: |
-          echo "Listing files..."
           ls -la
-          find . -maxdepth 3 -name "settings.gradle*" -o -name "build.gradle*"
-      
+          ls -la app/
+          find . -type f | head -n 100
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle
+      - name: Setup Gradle 8.7
         uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.7
 
-      - name: Build AAB
+      - name: Clean weird folder
+        run: rm -rf "./\`app" || true
+
+      - name: Build AAB (no wrapper needed)
         run: |
-          # Agar project root me nahi, toh subfolder dhoondo
-          if [ -f "./android/gradlew" ]; then
-            cd android && chmod +x gradlew && ./gradlew bundleRelease
-          elif [ -f "./app/build.gradle" ]; then
-            chmod +x ./gradlew 2>/dev/null || true
-            ./gradlew bundleRelease || gradle bundleRelease
+          if [ -f "settings.gradle.kts" ] || [ -f "settings.gradle" ]; then
+            gradle bundleRelease --stacktrace
+          elif [ -f "app/settings.gradle.kts" ]; then
+            cd app && gradle bundleRelease --stacktrace
           else
-            # Try to find where settings.gradle is
-            ROOT=$(find . -name "settings.gradle*" | head -1 | xargs dirname)
-            echo "Found project at: $ROOT"
-            cd $ROOT
-            chmod +x ./gradlew 2>/dev/null || true
-            ./gradlew bundleRelease || gradle bundleRelease
+            # root pe settings nahi hai toh banate hain
+            echo "include(':app')" > settings.gradle.kts
+            gradle bundleRelease --stacktrace
           fi
 
       - name: Upload AAB
@@ -46,4 +46,3 @@ jobs:
           name: app-release-aab
           path: |
             **/build/outputs/bundle/release/*.aab
-            **/outputs/bundle/release/*.aab
