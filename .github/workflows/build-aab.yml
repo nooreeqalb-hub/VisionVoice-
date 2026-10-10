@@ -14,16 +14,20 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Restore build.gradle.kts
-        run: |
-          ls -la app/
-          cat app/build.gradle.kts || echo "FILE MISSING"
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.7
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
+      - name: Check Files
+        run: |
+          ls -la
+          ls -la app/
+          echo "---settings---"
+          cat settings.gradle.kts || cat settings.gradle || echo "NO SETTINGS FILE"
 
       - name: Build APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: gradle assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
