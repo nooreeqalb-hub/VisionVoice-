@@ -18,13 +18,15 @@ jobs:
           gradle-version: 8.7
       - name: Fix settings.gradle.kts
         run: |
-          rm -rf "./`app" || true
+          rm -rf './`app' || true
           rm -f settings.gradle.kts settings.gradle
           echo 'include(":app")' > settings.gradle.kts
+          cat settings.gradle.kts
       - name: Build AAB
         run: gradle bundleRelease --stacktrace
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: app-release-aab
-          path: '**/build/outputs/bundle/release/*.aab'
+          path: |
+            **/build/outputs/bundle/release/*.aab
