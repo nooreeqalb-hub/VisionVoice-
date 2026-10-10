@@ -1,1 +1,71 @@
+package com.example.visionvoice
 
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ObjectDetectionScreen() {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var detectedText by remember { mutableStateOf("Camera is starting... Point to an object") }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("Object Detection") })
+        }
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding).fillMaxSize()) {
+            AndroidView(
+                factory = { ctx ->
+                    val previewView = PreviewView(ctx)
+                    val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+                    cameraProviderFuture.addListener({
+                        val cameraProvider = cameraProviderFuture.get()
+                        val preview = Preview.Builder().build().also {
+                            it.setSurfaceProvider(previewView.surfaceProvider)
+                        }
+                        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+                        try {
+                            cameraProvider.unbindAll()
+                            cameraProvider.bindToLifecycle(
+                                lifecycleOwner, cameraSelector, preview
+                            )
+                        } catch (exc: Exception) {
+                            detectedText = "Camera failed: ${exc.message}"
+                        }
+                    }, ContextCompat.getMainExecutor(ctx))
+                    previewView
+                },
+                modifier = Modifier.fillMaxWidth().weight(1f)
+            )
+            Card(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                Text(
+                    text = detectedText,
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Button(
+                onClick = { 
+                    // Here you will add TTS to speak detected object
+                    // For now just testing
+                    detectedText = "Example: Chair detected in front of you" 
+                },
+                modifier = Modifier.fillMaxWidth().padding(16.dp)
+            ) {
+                Text("Detect Object")
+            }
+        }
+    }
+}
