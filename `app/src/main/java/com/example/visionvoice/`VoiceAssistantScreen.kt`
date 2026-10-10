@@ -1,1 +1,108 @@
+package com.example.visionvoice
 
+import android.app.Activity
+import android.content.Intent
+import android.speech.RecognizerIntent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import java.util.Locale
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun VoiceAssistantScreen() {
+    val context = LocalContext.current
+    val speechHelper = remember { SpeechHelper(context) }
+    var lastCommand by remember { mutableStateOf("Tap mic and speak") }
+    var history by remember { mutableStateOf(listOf<String>()) }
+
+    DisposableEffect(Unit) {
+        onDispose { speechHelper.shutdown() }
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val spokenText = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.get(0) ?: ""
+            lastCommand = spokenText
+            history = listOf(spokenText) + history
+
+            // Simple command handling
+            when {
+                spokenText.contains("emergency", ignoreCase = true) -> {
+                    speechHelper.speak("Calling emergency contacts")
+                }
+                spokenText.contains("where am i", ignoreCase = true) -> {
+                    speechHelper.speak("Fetching your current location")
+                }
+                spokenText.contains("object", ignoreCase = true) -> {
+                    speechHelper.speak("Opening object detection")
+                }
+                else -> {
+                    speechHelper.speak("You said $spokenText")
+                }
+            }
+        }
+    }
+
+    fun startListening() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak now...")
+        }
+        launcher.launch(intent)
+    }
+
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("Voice Assistant") }) },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { startListening() }) {
+                Icon(Icons.Default.Mic, contentDescription = "Mic")
+            }
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+               .padding(padding)
+               .padding(16.dp)
+               .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Last command: $lastCommand",
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { startListening() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.Mic, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Tap to Speak")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("History", style = MaterialTheme.typography.titleMedium)
+            LazyColumn {
+                items(history) { item ->
+                    Text("- $item", modifier = Modifier.padding(4.dp))
+                }
+            }
+        }
+    }
+}
