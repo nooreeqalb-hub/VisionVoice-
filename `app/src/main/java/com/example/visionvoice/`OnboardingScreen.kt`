@@ -1,1 +1,55 @@
+package com.example.visionvoice
 
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
+
+@Composable
+fun OnboardingScreen(onFinish: () -> Unit) {
+    val context = LocalContext.current
+    val dataStore = remember { DataStoreManager(context) }
+    val scope = rememberCoroutineScope()
+
+    Column(
+        modifier = Modifier
+           .fillMaxSize()
+           .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Welcome to VisionVoice",
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Your personal assistant for navigation, object detection, and emergency help. This app is fully accessible with TalkBack.",
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(32.dp))
+        Text(
+            text = "1. Object Detection with voice feedback\n2. Voice Assistant for commands\n3. Emergency SOS with location sharing",
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Spacer(modifier = Modifier.height(48.dp))
+        Button(
+            onClick = {
+                scope.launch {
+                    dataStore.setOnboardingDone(true)
+                    onFinish()
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Get Started")
+        }
+    }
+}
