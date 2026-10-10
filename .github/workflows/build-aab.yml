@@ -11,7 +11,6 @@ jobs:
       - name: List all files
         run: |
           ls -la
-          ls -la app/
           find . -type f | head -n 100
 
       - name: Set up JDK 17
@@ -25,20 +24,138 @@ jobs:
         with:
           gradle-version: 8.7
 
-      - name: Clean weird folder
-        run: rm -rf "./\`app" || true
-
-      - name: Build AAB (no wrapper needed)
+      - name: Fix settings.gradle.kts
         run: |
-          if [ -f "settings.gradle.kts" ] || [ -f "settings.gradle" ]; then
-            gradle bundleRelease --stacktrace
-          elif [ -f "app/settings.gradle.kts" ]; then
-            cd app && gradle bundleRelease --stacktrace
-          else
-            # root pe settings nahi hai toh banate hain
-            echo "include(':app')" > settings.gradle.kts
-            gradle bundleRelease --stacktrace
-          fi
+          rm -rf "./\`app" || true
+          rm -f settings.gradle.kts settings.gradle
+          echo 'include(":app")' > settings.gradle.kts
+          cat settings.gradle.kts
+
+      - name: Build AAB
+        run: gradle bundleRelease --stacktrace
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: |
+            **/build/outputs/bundle/release/*.aabname: Build AAB
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: List all files
+        run: |
+          ls -la
+          find . -type f | head -n 100
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle 8.7
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.7
+
+      - name: Fix settings.gradle.kts
+        run: |
+          rm -rf "./\`app" || true
+          rm -f settings.gradle.kts settings.gradle
+          echo 'include(":app")' > settings.gradle.kts
+          cat settings.gradle.kts
+
+      - name: Build AAB
+        run: gradle bundleRelease --stacktrace
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: |
+            **/build/outputs/bundle/release/*.aabname: Build AAB
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: List all files
+        run: |
+          ls -la
+          find . -type f | head -n 100
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle 8.7
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.7
+
+      - name: Fix settings.gradle.kts
+        run: |
+          rm -rf "./\`app" || true
+          rm -f settings.gradle.kts settings.gradle
+          echo 'include(":app")' > settings.gradle.kts
+          cat settings.gradle.kts
+
+      - name: Build AAB
+        run: gradle bundleRelease --stacktrace
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: |
+            **/build/outputs/bundle/release/*.aabname: Build AAB
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: List all files
+        run: |
+          ls -la
+          find . -type f | head -n 100
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle 8.7
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.7
+
+      - name: Fix settings.gradle.kts
+        run: |
+          rm -rf "./\`app" || true
+          rm -f settings.gradle.kts settings.gradle
+          echo 'include(":app")' > settings.gradle.kts
+          cat settings.gradle.kts
+
+      - name: Build AAB
+        run: gradle bundleRelease --stacktrace
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4
