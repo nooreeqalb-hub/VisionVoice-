@@ -1,1 +1,50 @@
+package com.example.visionvoice
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+
+@Composable
+fun AppNavigation() {
+    val navController = rememberNavController()
+    val context = LocalContext.current
+    val dataStore = DataStoreManager(context)
+    val isOnboardingDone by dataStore.isOnboardingDone.collectAsState(initial = false)
+
+    val startDestination = if (isOnboardingDone) "home" else "onboarding"
+
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable("onboarding") {
+            OnboardingScreen(onFinish = {
+                navController.navigate("home") {
+                    popUpTo("onboarding") { inclusive = true }
+                }
+            })
+        }
+        composable("home") { 
+            HomeScreen(navController) 
+        }
+        composable("object_detection") { 
+            ObjectDetectionScreen() 
+        }
+        composable("voice_assistant") { 
+            VoiceAssistantScreen() 
+        }
+        composable("emergency_contacts") { 
+            EmergencyContactsScreen() 
+        }
+        composable("settings") { 
+            SettingsScreen() 
+        }
+        composable("feedback") { 
+            FeedbackScreen() 
+        }
+        composable("about_app") { 
+            AboutAppScreen() 
+        }
+    }
+}
