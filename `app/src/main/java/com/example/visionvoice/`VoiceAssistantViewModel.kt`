@@ -1,1 +1,80 @@
+package com.example.voiceassistant.ui
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+data class VoiceState(
+    val isListening: Boolean = false,
+    val recognizedText: String = "",
+    val responseText: String = "",
+    val isSpeaking: Boolean = false,
+    val error: String? = null
+)
+
+class VoiceAssistantViewModel : ViewModel() {
+
+    private val _uiState = MutableStateFlow(VoiceState())
+    val uiState: StateFlow<VoiceState> = _uiState.asStateFlow()
+
+    fun startListening() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isListening = true,
+                error = null
+            )
+        }
+    }
+
+    fun stopListening() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isListening = false
+            )
+        }
+    }
+
+    fun onSpeechResult(text: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                recognizedText = text,
+                isListening = false
+            )
+            generateResponse(text)
+        }
+    }
+
+    fun onError(errorMessage: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                error = errorMessage,
+                isListening = false,
+                isSpeaking = false
+            )
+        }
+    }
+
+    private fun generateResponse(input: String) {
+        viewModelScope.launch {
+            // TODO: Connect your AI / TTS logic here
+            val response = "You said: $input"
+            _uiState.value = _uiState.value.copy(
+                responseText = response,
+                isSpeaking = true
+            )
+        }
+    }
+
+    fun onSpeechFinished() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSpeaking = false)
+        }
+    }
+
+    fun clearError() {
+        _uiState.value = _uiState.value.copy(error = null)
+    }
+}
