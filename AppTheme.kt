@@ -50,7 +50,7 @@ fun VisionVoiceTheme(
     }
 
     MaterialTheme(
-        colorScheme = colorScheme,
+    colorScheme =     colorScheme,
         typography = Typography,
         content = content
     )
