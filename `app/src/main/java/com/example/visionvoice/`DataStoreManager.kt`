@@ -1,1 +1,50 @@
+package com.example.visionvoice
 
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+
+// Extension property for DataStore
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "vision_voice_prefs")
+
+class DataStoreManager(private val context: Context) {
+
+    companion object {
+        val IS_ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
+        val USER_NAME = stringPreferencesKey("user_name")
+        val EMERGENCY_CONTACT_1 = stringPreferencesKey("emergency_contact_1")
+        val EMERGENCY_CONTACT_2 = stringPreferencesKey("emergency_contact_2")
+        val TALKBACK_ENABLED = booleanPreferencesKey("talkback_enabled")
+    }
+
+    // Flows to observe data
+    val isOnboardingDone: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[IS_ONBOARDING_DONE] ?: false
+    }
+
+    val emergencyContact: Flow<String> = context.dataStore.data.map { prefs ->
+        prefs[EMERGENCY_CONTACT_1] ?: ""
+    }
+
+    // Save functions
+    suspend fun setOnboardingDone(done: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[IS_ONBOARDING_DONE] = done
+        }
+    }
+
+    suspend fun saveEmergencyContact(number: String) {
+        context.dataStore.edit { prefs ->
+            prefs[EMERGENCY_CONTACT_1] = number
+        }
+    }
+
+    suspend fun saveUserName(name: String) {
+        context.dataStore.edit { prefs ->
+            prefs[USER_NAME] = name
+        }
+    }
+}
