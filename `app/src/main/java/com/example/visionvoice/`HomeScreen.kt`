@@ -1,1 +1,67 @@
+package com.example.visionvoice
 
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+
+data class HomeItem(val title: String, val icon: ImageVector, val route: String)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreen(navController: NavController) {
+
+    val items = listOf(
+        HomeItem("Object Detection", Icons.Default.Visibility, "object_detection"),
+        HomeItem("Voice Assistant", Icons.Default.Mic, "voice_assistant"),
+        HomeItem("Emergency Contacts", Icons.Default.ContactEmergency, "emergency_contacts"),
+        HomeItem("Settings", Icons.Default.Settings, "settings"),
+        HomeItem("Feedback", Icons.Default.Feedback, "feedback"),
+        HomeItem("About App", Icons.Default.Info, "about_app")
+    )
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("VisionVoice") })
+        }
+    ) { padding ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+               .padding(padding)
+               .padding(16.dp)
+               .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(items.size) { index ->
+                val item = items[index]
+                Card(
+                    onClick = { navController.navigate(item.route) },
+                    modifier = Modifier
+                       .fillMaxWidth()
+                       .height(150.dp),
+                    elevation = CardDefaults.cardElevation(4.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(item.icon, contentDescription = item.title, modifier = Modifier.size(48.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(item.title, style = MaterialTheme.typography.titleMedium)
+                    }
+                }
+            }
+        }
+    }
+}
