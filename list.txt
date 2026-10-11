@@ -1,0 +1,7 @@
+.github
+app
+build.bat
+gradle.properties
+list.txt
+README.md
+`app

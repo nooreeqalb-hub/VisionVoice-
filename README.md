@@ -1,2 +1,1 @@
-VisionVoice-
-Vision Voice is an accessible Android app designed for blind and low-vision users. It provides OCR text reading, voice assistance, SOS emergency support, navigation tools, and accessibility-focused features to promote independence and inclusion.
+About Vision Voice: Vision Voice is an accessibility application designed for blind and low-vision individuals. Our mission is to make technology more inclusive by providing simple, voice-friendly, and easy-to-use tools that support independent living. The app focuses on accessibility, usability, and empowerment, helping users interact with information and services confidently.

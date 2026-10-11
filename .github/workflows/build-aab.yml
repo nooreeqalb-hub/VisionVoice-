@@ -1,4 +1,5 @@
-name: Build AAB
+```yaml
+name: Build AAB and APK
 on:
   push:
     branches: [ main ]
@@ -16,17 +17,25 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.7
-      - name: Fix settings.gradle.kts
+      - name: Fix settings
         run: |
           rm -rf './`app' || true
           rm -f settings.gradle.kts settings.gradle
           echo 'include(":app")' > settings.gradle.kts
           cat settings.gradle.kts
-      - name: Build AAB
-        run: gradle bundleRelease --stacktrace
+      - name: Build APK and AAB
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug bundleRelease
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: VisionVoice-APK-Testing
+          path: android/app/build/outputs/apk/debug/app-debug.apk
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-aab
-          path: |
-            **/build/outputs/bundle/release/*.aab
+          name: VisionVoice-AAB-PlayStore
+          path: android/app/build/outputs/bundle/release/*.aab
+```
