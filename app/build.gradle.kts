@@ -1,6 +1,8 @@
 plugins {
-    id("com.android.application") version "8.2.0"
-    id("org.jetbrains.kotlin.android") version "1.9.10"
+    id("com.android.application") version "8.2.0" apply false
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android") version "1.9.10" apply false
+    id("org.jetbrains.kotlin.android")
 }
 android {
     namespace = "com.example.visionvoice"
@@ -43,4 +45,3 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-}
