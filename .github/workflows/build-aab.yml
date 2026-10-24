@@ -1,9 +1,10 @@
-name: Build AAB and APK
+name: Build Signed AAB and APK for Play Store
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -25,20 +26,28 @@ jobs:
       - name: Grant Permission
         run: chmod +x gradlew
 
-      - name: Build APK
-        run: ./gradlew assembleDebug
+      - name: Generate Keystore for Release
+        run: |
+          keytool -genkey -v -keystore app/release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -storepass vision123 -keypass vision123 -alias visionvoice -dname "CN=VisionVoice, OU=Dev, O=Noor, L=Delhi, S=Delhi, C=IN"
+          echo "storeFile=release-key.jks" > app/keystore.properties
+          echo "storePassword=vision123" >> app/keystore.properties
+          echo "keyAlias=visionvoice" >> app/keystore.properties
+          echo "keyPassword=vision123" >> app/keystore.properties
 
-      - name: Build AAB
+      - name: Build Signed APK
+        run: ./gradlew assembleRelease
+
+      - name: Build Signed AAB for Play Store
         run: ./gradlew bundleRelease
 
-      - name: Upload APK
+      - name: Upload Signed APK
         uses: actions/upload-artifact@v4
         with:
-          name: VisionVoice-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: VisionVoice-Release-APK
+          path: app/build/outputs/apk/release/*.apk
 
-      - name: Upload AAB
+      - name: Upload Signed AAB - PLAY STORE
         uses: actions/upload-artifact@v4
         with:
-          name: VisionVoice-AAB
+          name: VisionVoice-Release-AAB-FINAL
           path: app/build/outputs/bundle/release/*.aab
