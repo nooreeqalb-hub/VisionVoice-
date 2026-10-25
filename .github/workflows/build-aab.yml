@@ -1,54 +1,30 @@
-name: Final AAB Build
-on: [push]
+name: Build VisionVoice
+
+on:
+  push:
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
-      - uses: gradle/actions/setup-gradle@v3
-      
-      - name: Fix and Overwrite build.gradle.kts
-        run: |
-          cat > app/build.gradle.kts << 'EOF'
-          plugins {
-              id("com.android.application")
-              id("org.jetbrains.kotlin.android")
-          }
-          android {
-              namespace = "com.example.visionvoice"
-              compileSdk = 34
-              defaultConfig {
-                  applicationId = "com.example.visionvoice"
-                  minSdk = 24
-                  targetSdk = 34
-                  versionCode = 1
-                  versionName = "1.0"
-              }
-              buildTypes {
-                  release { isMinifyEnabled = false }
-                  debug { isMinifyEnabled = false }
-              }
-              compileOptions {
-                  sourceCompatibility = JavaVersion.VERSION_17
-                  targetCompatibility = JavaVersion.VERSION_17
-              }
-              kotlinOptions {
-                  jvmTarget = "17"
-              }
-          }
-          dependencies {
-              implementation("androidx.core:core-ktx:1.12.0")
-              implementation("androidx.appcompat:appcompat:1.6.1")
-          }
-          EOF
 
-      - run: chmod +x gradlew
-      - run: ./gradlew bundleDebug
-      - uses: actions/upload-artifact@v4
+      - uses: gradle/actions/setup-gradle@v3
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
-          name: VisionVoice-AAB-FINAL
-          path: app/build/outputs/bundle/debug/*.aab
+          name: VisionVoice-APK
+          path: app/build/outputs/apk/debug/*.apk
