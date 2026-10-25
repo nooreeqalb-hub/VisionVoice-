@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "91734712109",
+    "project_id": "vision-voice-65f48",
+    "storage_bucket": "vision-voice-65f48.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91734712109:android:918601f8a2fcf106267da4",
+        "android_client_info": {
+          "package_name": "com.example.visionvoice"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJtZb4fsjWAs_4WXpsJreGdPDkO2JUT4U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
