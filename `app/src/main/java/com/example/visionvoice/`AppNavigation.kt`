@@ -1,4 +1,4 @@
-    package com.example.visionvoice
+package com.example.visionvoice
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -10,41 +10,70 @@ import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun AppNavigation() {
+
     val navController = rememberNavController()
+
     val context = LocalContext.current
     val dataStore = DataStoreManager(context)
-    val isOnboardingDone by dataStore.isOnboardingDone.collectAsState(initial = false)
 
-    val startDestination = if (isOnboardingDone) "home" else "onboarding"
+    val isOnboardingDone by dataStore.isOnboardingDone.collectAsState(
+        initial = false
+    )
 
-    NavHost(navController = navController, startDestination = startDestination) {
+    val startDestination =
+        if (isOnboardingDone) {
+            "home"
+        } else {
+            "onboarding"
+        }
+
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
+
         composable("onboarding") {
-            OnboardingScreen(onFinish = {
-                navController.navigate("home") {
-                    popUpTo("onboarding") { inclusive = true }
+            OnboardingScreen(
+                onFinish = {
+                    navController.navigate("home") {
+                        popUpTo("onboarding") {
+                            inclusive = true
+                        }
+                    }
                 }
-            })
+            )
         }
-        composable("home") { 
-            HomeScreen(navController) 
+
+        composable("home") {
+            HomeScreen(navController)
         }
-        composable("object_detection") { 
-            ObjectDetectionScreen() 
+
+        composable("object_detection") {
+            ObjectDetectionScreen()
         }
-        composable("voice_assistant") { 
-            VoiceAssistantScreen() 
+
+        composable("voice_assistant") {
+            VoiceAssistantScreen()
         }
-        composable("emergency_contacts") { 
-            EmergencyContactsScreen() 
+
+        composable("emergency_contacts") {
+            EmergencyContactsScreen()
         }
-        composable("settings") { 
-            SettingsScreen() 
+
+        composable("settings") {
+            SettingsScreen()
         }
-        composable("feedback") { 
-            FeedbackScreen() 
+
+        composable("feedback") {
+            FeedbackScreen()
         }
-        composable("about_app") { 
-            AboutAppScreen() 
+
+        composable("about_app") {
+            AboutAppScreen(
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
