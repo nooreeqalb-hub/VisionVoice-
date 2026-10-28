@@ -1,4 +1,4 @@
-package com.example.voiceassistant.ui
+package com.example.visionvoice
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -43,6 +43,7 @@ class VoiceAssistantViewModel : ViewModel() {
                 recognizedText = text,
                 isListening = false
             )
+
             generateResponse(text)
         }
     }
@@ -59,8 +60,9 @@ class VoiceAssistantViewModel : ViewModel() {
 
     private fun generateResponse(input: String) {
         viewModelScope.launch {
-            // TODO: Connect your AI / TTS logic here
+
             val response = "You said: $input"
+
             _uiState.value = _uiState.value.copy(
                 responseText = response,
                 isSpeaking = true
@@ -70,11 +72,15 @@ class VoiceAssistantViewModel : ViewModel() {
 
     fun onSpeechFinished() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isSpeaking = false)
+            _uiState.value = _uiState.value.copy(
+                isSpeaking = false
+            )
         }
     }
 
     fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
+        _uiState.value = _uiState.value.copy(
+            error = null
+        )
     }
 }
